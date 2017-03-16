@@ -50,6 +50,8 @@ public class SmcJarWrapper extends Task
      DEFAULT_SUFFIXES.put("graph", "dot");
      DEFAULT_SUFFIXES.put("groovy", "groovy");
      DEFAULT_SUFFIXES.put("java", "java");
+     DEFAULT_SUFFIXES.put("java7", "java");
+     DEFAULT_SUFFIXES.put("js", "js")
      DEFAULT_SUFFIXES.put("lua", "lua");
      DEFAULT_SUFFIXES.put("objc", "m");
      DEFAULT_SUFFIXES.put("perl", "pl");
@@ -125,6 +127,8 @@ public class SmcJarWrapper extends Task
        "graph",
        "groovy",
        "java",
+       "java7",
+       "js",
        "lua",
        "objc",
        "perl",

@@ -35,6 +35,8 @@
 package net.sf.smc.generator;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +81,8 @@ public final class SmcGraphGenerator
     {
         super (options, "dot");
 
-        _indent_action = "&nbsp;&nbsp;&nbsp;";
+        _transitions = new StringWriter();
+        _transitionSource = new PrintWriter(_transitions);
     } // end of SmcGraphGenerator(SmcOptions)
 
     //
@@ -96,6 +99,11 @@ public final class SmcGraphGenerator
      */
     public void visit(SmcFSM fsm)
     {
+        SmcState defaultState;
+        Map<String, String> pushEntryMap = new HashMap<String, String>();
+        Map<String, String> popTransMap = new HashMap<String, String>();
+        Map<String, String> pushStateMap = new HashMap<String, String>();
+
         // Create one overall graph and place each map in a
         // subgraph.
         _source.print("digraph ");
@@ -126,6 +134,12 @@ public final class SmcGraphGenerator
             _source.println("    }");
             _source.println();
         }
+
+        // Output the transitions *outside* of the subgraphs.
+        _source.println("    //");
+        _source.println("    // Transitions (Edges)");
+        _source.println("    //");
+        _source.println(_transitions.toString());
 
         // Output the digraph's closing brace.
         _source.println("}");
@@ -354,10 +368,6 @@ public final class SmcGraphGenerator
             _source.println();
         }
 
-        _source.println("        //");
-        _source.println("        // Transitions (Edges)");
-        _source.println("        //");
-
         // For each state, output its transitions.
         for (SmcState state: map.getStates())
         {
@@ -367,6 +377,7 @@ public final class SmcGraphGenerator
             {
                 transition.accept(this);
             }
+
             if (defaultState != null)
             {
                 for (SmcTransition transition: defaultState.getTransitions())
@@ -389,50 +400,50 @@ public final class SmcGraphGenerator
         // Now output the pop transitions.
         for (String pname: popTransMap.keySet())
         {
-            _source.println();
-            _source.print("        \"");
-            _source.print(mapName);
-            _source.print("::pop(");
-            _source.print(pname);
-            _source.print(")\" -> \"");
-            _source.print(mapName);
-            _source.println("::%end\"");
-            _source.print("            [label=\"pop(");
-            _source.print(popTransMap.get(pname));
-            _source.println(");\\l\"];");
+            _transitionSource.println();
+            _transitionSource.print("    \"");
+            _transitionSource.print(mapName);
+            _transitionSource.print("::pop(");
+            _transitionSource.print(pname);
+            _transitionSource.print(")\" -> \"");
+            _transitionSource.print(mapName);
+            _transitionSource.println("::%end\"");
+            _transitionSource.print("        [label=\"pop(");
+            _transitionSource.print(popTransMap.get(pname));
+            _transitionSource.println(");\\l\"];");
         }
 
         // Now output the composite state transition.
         for (String pname: pushStateMap.keySet())
         {
-            _source.println();
-            _source.print("        \"");
-            _source.print(pname);
-            _source.print("\" -> \"");
-            _source.print(pname.substring(0, pname.lastIndexOf("::")));
-            _source.println("\"");
-            _source.println("            [label=\"pop/\"]");
+            _transitionSource.println();
+            _transitionSource.print("    \"");
+            _transitionSource.print(pname);
+            _transitionSource.print("\" -> \"");
+            _transitionSource.print(pname.substring(0, pname.lastIndexOf("::")));
+            _transitionSource.println("\"");
+            _transitionSource.println("        [label=\"pop/\"]");
         }
 
         if (startMapName.equals(mapName) == true)
         {
             // Output the start transition only in the right map
-            _source.println();
-            _source.print("        \"%start\" -> \"");
-            _source.print(startStateName);
-            _source.println("\"");
+            _transitionSource.println();
+            _transitionSource.print("    \"%start\" -> \"");
+            _transitionSource.print(startStateName);
+            _transitionSource.println("\"");
         }
 
         // Now output the push actions as entry "transition".
         for (String pname: pushEntryMap.keySet())
         {
-            _source.println();
-            _source.print("        \"push(");
-            _source.print(pname);
-            _source.print(")\" -> \"");
-            _source.print(pname);
-            _source.println("\"");
-            _source.println("            [arrowtail=odot];");
+            _transitionSource.println();
+            _transitionSource.print("    \"push(");
+            _transitionSource.print(pname);
+            _transitionSource.print(")\" -> \"");
+            _transitionSource.print(pname);
+            _transitionSource.println("\"");
+            _transitionSource.println("        [arrowtail=odot];");
         }
 
         return;
@@ -485,7 +496,7 @@ public final class SmcGraphGenerator
                 // Output the entry actions, one per line.
                 for (SmcAction action: actions)
                 {
-                    _source.print(_indent_action);
+                    _source.print(INDENT_ACTION);
                     action.accept(this);
                 }
             }
@@ -507,7 +518,7 @@ public final class SmcGraphGenerator
                 // Output the exit actions, one per line.
                 for (SmcAction action: actions)
                 {
-                    _source.print(_indent_action);
+                    _source.print(INDENT_ACTION);
                     action.accept(this);
                 }
             }
@@ -581,14 +592,14 @@ public final class SmcGraphGenerator
                             // Output the actions, one per line.
                             for (SmcAction action: actions)
                             {
-                                _source.print(_indent_action);
+                                _source.print(INDENT_ACTION);
                                 action.accept(this);
                             }
                         }
 
                         if (transType == TransType.TRANS_PUSH)
                         {
-                            _source.print(_indent_action);
+                            _source.print(INDENT_ACTION);
                             _source.print("push(");
                             _source.print(pushStateName);
                             _source.print(")\\l");
@@ -670,14 +681,14 @@ public final class SmcGraphGenerator
                                         // Output the actions, one per line.
                                         for (SmcAction action: actions)
                                         {
-                                            _source.print(_indent_action);
+                                            _source.print(INDENT_ACTION);
                                             action.accept(this);
                                         }
                                     }
 
                                     if (transType == TransType.TRANS_PUSH)
                                     {
-                                        _source.print(_indent_action);
+                                        _source.print(INDENT_ACTION);
                                         _source.print("push(");
                                         _source.print(pushStateName);
                                         _source.print(")\\l");
@@ -734,12 +745,12 @@ public final class SmcGraphGenerator
             return;
         }
 
-        _source.println();
-        _source.print("        \"");
-        _source.print(mapName);
-        _source.print("::");
-        _source.print(stateName);
-        _source.print("\" -> ");
+        _transitionSource.println();
+        _transitionSource.print("    \"");
+        _transitionSource.print(mapName);
+        _transitionSource.print("::");
+        _transitionSource.print(stateName);
+        _transitionSource.print("\" -> ");
 
         if (transType != TransType.TRANS_POP)
         {
@@ -753,49 +764,49 @@ public final class SmcGraphGenerator
                 endStateName = mapName + "::" + endStateName;
             }
 
-            _source.print("\"");
-            _source.print(endStateName);
+            _transitionSource.print("\"");
+            _transitionSource.print(endStateName);
 
             if (transType == TransType.TRANS_PUSH)
             {
                 int index = pushStateName.indexOf("::");
 
-                _source.print("::");
+                _transitionSource.print("::");
 
                 if (index < 0)
                 {
-                    _source.print(mapName);
+                    _transitionSource.print(mapName);
                 }
                 else
                 {
-                    _source.print(pushStateName.substring(0, pushStateName.indexOf("::")));
+                    _transitionSource.print(pushStateName.substring(0, pushStateName.indexOf("::")));
                 }
             }
 
-            _source.println("\"");
+            _transitionSource.println("\"");
         }
         else
         {
             String popArgs = guard.getPopArgs();
 
-            _source.print("\"");
-            _source.print(mapName);
-            _source.print("::pop(");
-            _source.print(endStateName);
+            _transitionSource.print("\"");
+            _transitionSource.print(mapName);
+            _transitionSource.print("::pop(");
+            _transitionSource.print(endStateName);
 
             if (_graphLevel == GRAPH_LEVEL_2 &&
                 popArgs != null &&
                 popArgs.length() > 0)
             {
-                _source.print(", ");
-                _source.print(_escape(_normalize(popArgs)));
+                _transitionSource.print(", ");
+                _transitionSource.print(_escape(_normalize(popArgs)));
             }
 
-            _source.println(")\"");
+            _transitionSource.println(")\"");
         }
 
-        _source.print("            [label=\"");
-        _source.print(transName);
+        _transitionSource.print("        [label=\"");
+        _transitionSource.print(transName);
 
         // Graph Level 2: Output the transition parameters.
         if (_graphLevel == GRAPH_LEVEL_2)
@@ -805,15 +816,15 @@ public final class SmcGraphGenerator
             Iterator<SmcParameter> pit;
             String sep;
 
-            _source.print("(");
+            _transitionSource.print("(");
             for (pit = parameters.iterator(), sep = "";
                  pit.hasNext() == true;
                  sep = ", ")
             {
-                _source.print(sep);
+                _transitionSource.print(sep);
                 (pit.next()).accept(this);
             }
-            _source.print(")");
+            _transitionSource.print(")");
         }
 
         // Graph Level 1, 2: Output the guard.
@@ -823,20 +834,20 @@ public final class SmcGraphGenerator
         {
             String continueLine = "\\\\";
 
-            _source.print("\\l\\[");
+            _transitionSource.print("\\l\\[");
 
             // If the condition contains line separators,
             // then replace them with a "\n" so Graphviz knows
             // about the line separation.
             // 4.3.0: First escape the condition then replace the
             //        line separators.
-            _source.print(
+            _transitionSource.print(
                 _escape(condition).replaceAll(
                     "\\n", "\\\\\\l"));
 
-            _source.print("\\]");
+            _transitionSource.print("\\]");
         }
-        _source.print("/\\l");
+        _transitionSource.print("/\\l");
 
         // Graph Level 1, 2: output actions.
         if (_graphLevel > GRAPH_LEVEL_0 &&
@@ -850,12 +861,12 @@ public final class SmcGraphGenerator
 
         if (transType == TransType.TRANS_PUSH)
         {
-            _source.print("push(");
-            _source.print(pushStateName);
-            _source.print(")\\l");
+            _transitionSource.print("push(");
+            _transitionSource.print(pushStateName);
+            _transitionSource.print(")\\l");
         }
 
-        _source.println("\"];");
+        _transitionSource.println("\"];");
 
         return;
     } // end of visit(SmcGuard)
@@ -873,7 +884,7 @@ public final class SmcGraphGenerator
         // Note: do not output an end-of-line.
         if (_graphLevel >= GRAPH_LEVEL_1)
         {
-            _source.print(action.getName());
+            _transitionSource.print(action.getName());
 
             if (_graphLevel == GRAPH_LEVEL_2)
             {
@@ -882,7 +893,7 @@ public final class SmcGraphGenerator
 
                 if (action.isProperty() == true)
                 {
-                    _source.print(" = ");
+                    _transitionSource.print(" = ");
 
                     arg = arguments.get(0).trim();
 
@@ -894,7 +905,7 @@ public final class SmcGraphGenerator
 
                     // Then replace all double quotes with
                     // a backslash double qoute.
-                    _source.print(
+                    _transitionSource.print(
                         arg.replaceAll("\"", "\\\\\""));
                 }
                 else
@@ -902,7 +913,7 @@ public final class SmcGraphGenerator
                     Iterator<String> it;
                     String sep;
 
-                    _source.print("(");
+                    _transitionSource.print("(");
 
                     // Now output the arguments.
                     for (it = arguments.iterator(),
@@ -912,7 +923,7 @@ public final class SmcGraphGenerator
                     {
                         arg = (it.next()).trim();
 
-                        _source.print(sep);
+                        _transitionSource.print(sep);
 
                         // If the argument is a quoted string, then
                         // the quotes must be escaped.
@@ -922,15 +933,15 @@ public final class SmcGraphGenerator
 
                         // Then replace all double quotes with
                         // a backslash double qoute.
-                        _source.print(
+                        _transitionSource.print(
                             arg.replaceAll("\"", "\\\\\""));
                     }
 
-                    _source.print(")");
+                    _transitionSource.print(")");
                 }
             }
 
-            _source.print(";\\l");
+            _transitionSource.print(";\\l");
         }
 
         return;
@@ -943,11 +954,11 @@ public final class SmcGraphGenerator
     public void visit(SmcParameter parameter)
     {
         // Graph Level 2
-        _source.print(parameter.getName());
+        _transitionSource.print(parameter.getName());
         if (parameter.getType().equals("") == false)
         {
-            _source.print(": ");
-            _source.print(parameter.getType());
+            _transitionSource.print(": ");
+            _transitionSource.print(parameter.getType());
         }
 
         return;
@@ -1030,9 +1041,33 @@ public final class SmcGraphGenerator
 // Member data
 //
 
-    String _indent_action;
+    /**
+     * The currently accepted FSM state.
+     */
+    private SmcState _state;
 
-    SmcState _state;
+    /**
+     * Contains the transitions output which is posted outside
+     * of the subgraphs <em>but</em> generated when outputing
+     * the subgaphs.
+     */
+    private final StringWriter _transitions;
+
+    /**
+     * Encapsulates {@link #_transitions} for easier transition
+     * output.
+     */
+    private final PrintWriter _transitionSource;
+
+    //-----------------------------------------------------------
+    // Constants.
+    //
+
+    /**
+     * Indent, DOT notation.
+     */
+    private static final String INDENT_ACTION =
+        "&nbsp;&nbsp;&nbsp;";
 } // end of class SmcGraphGenerator
 
 //

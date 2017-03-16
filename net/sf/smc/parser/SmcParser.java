@@ -430,7 +430,13 @@ public final class SmcParser
 
     /* package */ void setFsmClassName(String name)
     {
-        _fsm.setFsmClassName(name.trim());
+        final String trimmedName = name.trim();
+
+        _fsm.setFsmClassName(trimmedName);
+
+        // %fsmclass also impacts the target file name as well.
+        _fsm.setFsmTargetFile(trimmedName);
+
         return;
     }
 

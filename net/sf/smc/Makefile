@@ -106,7 +106,7 @@ APP_CLASSPATH=	$(STATEMAP_LIB_DIR)/statemap.jar
 BIN_DIR=	../../../bin
 INSTALL_DIR=	../../../../staging/smc/bin
 
-JAVAC_FLAGS=	-d . -g -source 1.7 -target 1.7 -Xlint:unchecked -classpath .:$(APP_CLASSPATH)
+JAVAC_FLAGS=	-d . -g -source $(SOURCE_VERSION) -target $(TARGET_VERSION) -Xlint:unchecked -classpath .:$(APP_CLASSPATH)
 
 SMC=		$(JAVA_BIN)java -jar $(BIN_DIR)/Smc.jar
 SMC_FLAGS=	-java -g

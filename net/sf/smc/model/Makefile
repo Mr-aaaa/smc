@@ -56,7 +56,7 @@ SOURCES= \
 PACKAGE_NAME=	net.sf.smc.model
 PACKAGE_DIR=	$(subst .,/,$(PACKAGE_NAME))
 
-JAVAC_FLAGS=	-d . -g -source 1.7 -target 1.7 -Xlint:unchecked
+JAVAC_FLAGS=	-d . -g -source $(SOURCE_VERSION) -target $(TARGET_VERSION) -Xlint:unchecked
 
 JAR_CREATE_FLAGS=	cf
 JAR_FILE=	SmcModel.jar

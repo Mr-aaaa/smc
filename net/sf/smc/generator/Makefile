@@ -70,7 +70,7 @@ SOURCES= \
 PACKAGE_NAME=	net.sf.smc.generator
 PACKAGE_DIR=	$(subst .,/,$(PACKAGE_NAME))
 
-JAVAC_FLAGS=	-d . -g -source 1.7 -target 1.7 -Xlint:unchecked -classpath ../model/SmcModel.jar
+JAVAC_FLAGS=	-d . -g -source $(SOURCE_VERSION) -target $(TARGET_VERSION) -Xlint:unchecked -classpath ../model/SmcModel.jar
 
 JAR_CREATE_FLAGS=	cf
 JAR_FILE=	SmcGenerator.jar

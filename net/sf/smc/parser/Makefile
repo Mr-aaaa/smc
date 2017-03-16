@@ -61,7 +61,7 @@ APP_CLASSPATH=	$(STATEMAP_LIB_DIR)/statemap.jar:../model/SmcModel.jar
 BIN_DIR=		../../../../bin
 INSTALL_DIR=	../../../../../staging/smc/lib/Java
 
-JAVAC_FLAGS=	-d . -g -source 1.7 -target 1.7 -Xlint:unchecked -classpath $(APP_CLASSPATH)
+JAVAC_FLAGS=	-d . -g -source $(SOURCE_VERSION) -target $(TARGET_VERSION) -Xlint:unchecked -classpath $(APP_CLASSPATH)
 
 JAR_CREATE_FLAGS=	cf
 JAR_FILE=	SmcParser.jar
