@@ -51,7 +51,7 @@ public class SmcJarWrapper extends Task
      DEFAULT_SUFFIXES.put("groovy", "groovy");
      DEFAULT_SUFFIXES.put("java", "java");
      DEFAULT_SUFFIXES.put("java7", "java");
-     DEFAULT_SUFFIXES.put("js", "js")
+     DEFAULT_SUFFIXES.put("js", "js");
      DEFAULT_SUFFIXES.put("lua", "lua");
      DEFAULT_SUFFIXES.put("objc", "m");
      DEFAULT_SUFFIXES.put("perl", "pl");
