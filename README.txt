@@ -2,6 +2,63 @@
 
                                SMC
                      The State Machine Compiler
+                         (Version: 6.6.1)
+
+                     http://smc.sourceforge.net
+
+
+
+0. What's New?
+--------------
+
+Major changes:
+
+None.
+
+
+Minor changes:
+
+None.
+
+
+Bug Fixes:
+
+(All)
+    smc-anttask now recognizes all currently supported SMC target
+    languages.
+    (SF bug 207, 208)
+
+(Objective C)
+    getPreviousState() now returns the correct value *after* a
+    transition completes.
+    (SF bug 209)
+
+(C++ using -crtp)
+    When using -crtp, the generated code now outputs the correct
+    getOwner() methods:
+
+        inline DERIVED& getOwner() {...}
+        inline const DERIVED getOwner() const {...}
+    (SF bug 210)
+
+(Graphviz)
+    The Graphviz .dot file now defines all transitions after
+    defining subgraphs. This corrects the problem of subgraphs
+    containing incorrect states due to jump transitions between
+    subgraphs.
+    (SF bug 211)
+
+(All)
+    Corrected Makefile and smc.mk so that staging/Release
+    directory is automatically created if it does not already
+    exist. Also added macros to smc.mk which specify the Java
+    source and target versions.
+    (SF bug 212)
+
+
+
+                               SMC
+                     The State Machine Compiler
                          (Version: 6.6.0)
 
                      http://smc.sourceforge.net

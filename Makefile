@@ -90,7 +90,7 @@ clean :
 		$(MAKE) -C lib clean
 		$(MAKE) -C ./net/sf/smc clean
 
-smc_dist :	$(SMC_STAGING_DIR)
+smc_dist :	$(SMC_STAGING_DIR) $(RELEASE_DIR)
 		-(cd $(RELEASE_DIR); \
 		   $(RM_F) $(TAR_FILE) \
 		           $(TAR_GZ_FILE) \
@@ -105,7 +105,7 @@ smc_dist :	$(SMC_STAGING_DIR)
 		(cd $(STAGING_DIR); \
 		  zip -b . -r $(ZIP_FILE) ./smc_$(VERSION))
 
-src_dist :	$(SMC_RELEASE_DIR)
+src_dist :	$(SMC_RELEASE_DIR) $(RELEASE_DIR)
 		$(CP_F) lib/C++/statemap.h $(SMC_RELEASE_DIR)/lib
 		$(CP_F) lib/Java/statemap.jar $(SMC_RELEASE_DIR)/lib
 		(cd ..; \
@@ -120,7 +120,7 @@ src_dist :	$(SMC_RELEASE_DIR)
 
 dist : 		install smc_dist src_dist
 
-distclean :
+distclean :	 $(RELEASE_DIR)
 		-(cd $(RELEASE_DIR); \
 		    $(RM_F) $(TAR_FILE) \
 		            $(TAR_GZ_FILE) \
@@ -128,10 +128,11 @@ distclean :
 		            $(ZIP_FILE))
 		-$(RM_RF) $(SMC_RELEASE_DIR)
 		-(cd ..; \
-		    $(RM_FR) $(SRC_TAR_FILE) \
+		    $(RM_F) $(SRC_TAR_FILE) \
 			   $(SRC_TAR_GZ_FILE) \
 			   $(SRC_GZIP_FILE) \
 			   $(SRC_ZIP_FILE))
+		-$(RM_RF) $(DOC_DIR)
 
 realclean :
 		$(MAKE) -C lib realclean

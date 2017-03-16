@@ -40,17 +40,17 @@
 # Macros.
 #
 
-VERSION=        6_6_0
+VERSION=        6_6_1
 
 STAGING_DIR=    ../staging
 SMC_STAGING_DIR=$(STAGING_DIR)/smc
 SMC_RELEASE_DIR=$(STAGING_DIR)/smc_$(VERSION)
-RELEASE_DIR=    $(STAGING_DIR)/releases
+RELEASE_DIR=    $(STAGING_DIR)/Releases
 
 PACKAGE_NAME=   statemap
 
 CP_F=		cp -f
-CP_RFP=		cp -R -f -p
+CP_RFP=	cp -R -f -p
 CHMOD=		chmod
 MKDIR=		mkdir -p
 MV=		mv
@@ -61,15 +61,18 @@ JAVA_BIN=	/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home/bin/
 JAVAC=          $(JAVA_BIN)javac
 JAR=            $(JAVA_BIN)jar
 
+SOURCE_VERSION=1.7
+TARGET_VERSION=1.7
+
 JAVADOC=	javadoc
-DOC_VERSION=	$(VERSION)
+DOC_VERSION=	$(subst _,.,$(VERSION))
 DOC_DIR=	./docs/javadocs
 DOC_SOURCES=	./doc_sources.txt
 
 WINDOW_TITLE=	'SMC v. $(DOC_VERSION) API Specification'
 DOC_TITLE=	'SMC v. $(DOC_VERSION) API Specification'
 HEADER=		'<b>SMC</b><br><font size="-1">$(DOC_VERSION)</font>'
-FOOTER=		'<font size=-1>Copyright &copy; 2015. Charles W. Rapp. All Rights Reserved. Use is subject to <a href=\"\">license terms</a>.</font>'
+FOOTER=		'<font size=-1>Copyright &copy; 2015. Charles W. Rapp. All Rights Reserved. Use is subject to <a href=\"https://www.mozilla.org/en-US/MPL/1.1/\">license terms</a>.</font>'
 OVERVIEW=	./overview.html
 
 JAVADOC_FLAGS=	-protected \
@@ -102,6 +105,9 @@ $(STAGING_DIR) :
 $(SMC_STAGING_DIR) :    $(STAGING_DIR)
 		-$(RM_RF) $(SMC_STAGING_DIR)
 		$(MKDIR) $(SMC_STAGING_DIR)
+
+$(RELEASE_DIR) :	$(STAGING_DIR)
+		$(MKDIR) $(RELEASE_DIR)
 
 #
 # CHANGE LOG
