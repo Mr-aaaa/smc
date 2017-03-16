@@ -183,6 +183,18 @@
 - (void)setState:(SMCState*)state;
 {
     if (state != _state) {
+        // clearState is not called when a transition has no
+        // actions, so set _previousState to _state in that
+        // situation. We know clearState was not called when
+        // _state is not null;
+        if (_state != NULL) {
+            if (_previousState != NULL) {
+                [_previousState S_RELEASE];
+            }
+
+            _previousState = [_state S_RETAIN];
+        }
+
         [_state S_RELEASE];
         _state = [state S_RETAIN];
         if ([self debugFlag]) {
@@ -239,6 +251,17 @@
 
     // Popping when there was no previous push is an error.
     NSAssert(_stateStack != NULL, @"Popping empty state stack");
+
+    // clearState is not called when a transition has no actions,
+    // so set _previousState to _state in that situation. We know
+    // clearState was not called when _state is not null;
+    if (_state != NULL) {
+        if (_previousState != NULL) {
+            [_previousState S_RELEASE];
+        }
+
+        _previousState = [_state S_RETAIN];
+    }
 
     [_state S_RELEASE]; _state = [[_stateStack state] S_RETAIN];
     entry = _stateStack;

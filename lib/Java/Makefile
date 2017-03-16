@@ -40,7 +40,7 @@ LIB_SOURCES=    FSMContext.java \
 		State7.java \
 		TransitionHandle.java
 
-JAVAC_FLAGS=    -d . -g -source 1.7 -target 1.7
+JAVAC_FLAGS=    -d . -g -source $(SOURCE_VERSION) -target $(TARGET_VERSION)
 JAR_FLAGS=      cvf
 JAR_FILE=       ./$(PACKAGE_NAME).jar
 
