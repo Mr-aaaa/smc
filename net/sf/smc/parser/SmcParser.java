@@ -98,6 +98,7 @@ public final class SmcParser
         _messages = new ArrayList<>();
         _transitions = new HashMap<>();
         _nextTransitionId = 1;
+        _entryExitFlag = false;
 
         _lexer = new SmcLexer(istream, debugFlag);
         _parserFSM = new SmcParserContext(this);
@@ -1122,7 +1123,9 @@ public final class SmcParser
         return(retval);
     }
 
-    /* package */ void createAction(String name, int lineNumber)
+    /* package */ void createAction(final String name,
+                                    final int lineNumber,
+                                    final boolean entryExitFlag)
     {
         if (_actionInProgress != null)
         {
@@ -1144,7 +1147,7 @@ public final class SmcParser
             }
 
             _actionInProgress =
-                new SmcAction(name, lineNumber);
+                new SmcAction(name, lineNumber, entryExitFlag);
         }
 
         return;
@@ -1322,6 +1325,17 @@ public final class SmcParser
 
         return;
     } // end of clearArguments()
+
+    /* package */ boolean getEntryExitFlag()
+    {
+        return (_entryExitFlag);
+    } // end of getEntryExitFlag()
+
+    /* package */ void setEntryExitFlag(final boolean flag)
+    {
+        _entryExitFlag = flag;
+        return;
+    } // end of setEntryExitFlag(boolean)
 
     //
     // end of State Machine Actions
@@ -1698,6 +1712,11 @@ public final class SmcParser
     private SmcParameter _paramInProgress;
     private SmcAction _actionInProgress;
     private String _argInProgress;
+
+    // Set to true if the action currently being parsed is in a
+    // state entry or exit block; false if it is a transition
+    // action.
+    private boolean _entryExitFlag;
 
     // Store parsed parameters here.
     private List<SmcParameter> _paramList;

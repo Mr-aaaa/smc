@@ -87,11 +87,16 @@ public final class SmcAction
      * FSM context method.
      * @param lineNumber where the action appears in the .sm
      * file.
+     * @param entryExitFlag {@code true} if this action appears
+     * in a state's entry or exit block.
      */
-    public SmcAction(String name, int lineNumber)
+    public SmcAction(final String name,
+                     final int lineNumber,
+                     final boolean entryExitFlag)
     {
         super (name, lineNumber);
 
+        _entryExitFlag = entryExitFlag;
         _arguments = null;
         _propertyFlag = false;
         _staticFlag = false;
@@ -103,6 +108,8 @@ public final class SmcAction
      * FSM context method.
      * @param lineNumber where the action appears in the .sm
      * file.
+     * @param entryExitFlag {@code true} if this action appears
+     * in a state's entry or exit block.
      * @param propertyFlag if {@code true}, then this action is
      * a .Net property assignment and {@code arguments} must be
      * a non-{@code null} list with exactly one item.
@@ -113,10 +120,11 @@ public final class SmcAction
      * {@code arguments} is either {@code null} or does not
      * contain exactly one item.
      */
-    public SmcAction(String name,
-                     int lineNumber,
-                     boolean propertyFlag,
-                     List<String> arguments)
+    public SmcAction(final String name,
+                     final int lineNumber,
+                     final boolean entryExitFlag,
+                     final boolean propertyFlag,
+                     final List<String> arguments)
         throws IllegalArgumentException
     {
         super (name, lineNumber);
@@ -131,6 +139,7 @@ public final class SmcAction
         }
         else
         {
+            _entryExitFlag = entryExitFlag;
             _arguments = arguments;
             _propertyFlag = propertyFlag;
         }
@@ -209,6 +218,17 @@ public final class SmcAction
     //-----------------------------------------------------------
     // Get methods.
     //
+
+    /**
+     * Returns {@code true} if this action appears in a state
+     * entry or exit block; otherwise returns {@code false} if
+     * this is a transition action.
+     * @return {@code true} if this is an entry/exit action.
+     */
+    public boolean isEntryExitAction()
+    {
+        return (_entryExitFlag);
+    } // end of isEntryExitAction()
 
     /**
      * Returns {@code true} if this action is a .Net property
@@ -346,6 +366,16 @@ public final class SmcAction
 //---------------------------------------------------------------
 // Member Data
 //
+
+    /**
+     * Set to {@code true} if this action appears in a state
+     * entry or exit block; otherwise, set to {@code false} if
+     * this is a transition action. The reason for
+     * differentiating between the two is that entry/exit
+     * actions appear in the node subgraph definition while
+     * transition actions are defined after the subgraphs.
+     */
+    private final boolean _entryExitFlag;
 
     // The action's argument list.
     private List<String> _arguments;

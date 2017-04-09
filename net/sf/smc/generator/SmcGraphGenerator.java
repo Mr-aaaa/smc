@@ -34,9 +34,8 @@
 
 package net.sf.smc.generator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -81,8 +80,9 @@ public final class SmcGraphGenerator
     {
         super (options, "dot");
 
-        _transitions = new StringWriter();
-        _transitionSource = new PrintWriter(_transitions);
+        _transitions =
+            new ByteArrayOutputStream(TRANSITION_OUTPUT_SIZE);
+        _transitionSource = new PrintStream(_transitions);
     } // end of SmcGraphGenerator(SmcOptions)
 
     //
@@ -875,8 +875,13 @@ public final class SmcGraphGenerator
      * Emits GraphViz code for this FSM action.
      * @param action emits GraphViz code for this action.
      */
-    public void visit(SmcAction action)
+    public void visit(final SmcAction action)
     {
+        final PrintStream source =
+            (action.isEntryExitAction() == true ?
+             _source :
+             _transitionSource);
+
         // Actions are only reported for graph levels 1 and 2.
         // Graph level 1: only the action name, no arguments.
         // Graph level 2: action name and arguments.
@@ -884,7 +889,7 @@ public final class SmcGraphGenerator
         // Note: do not output an end-of-line.
         if (_graphLevel >= GRAPH_LEVEL_1)
         {
-            _transitionSource.print(action.getName());
+            source.print(action.getName());
 
             if (_graphLevel == GRAPH_LEVEL_2)
             {
@@ -893,7 +898,7 @@ public final class SmcGraphGenerator
 
                 if (action.isProperty() == true)
                 {
-                    _transitionSource.print(" = ");
+                    source.print(" = ");
 
                     arg = arguments.get(0).trim();
 
@@ -905,7 +910,7 @@ public final class SmcGraphGenerator
 
                     // Then replace all double quotes with
                     // a backslash double qoute.
-                    _transitionSource.print(
+                    source.print(
                         arg.replaceAll("\"", "\\\\\""));
                 }
                 else
@@ -913,7 +918,7 @@ public final class SmcGraphGenerator
                     Iterator<String> it;
                     String sep;
 
-                    _transitionSource.print("(");
+                    source.print("(");
 
                     // Now output the arguments.
                     for (it = arguments.iterator(),
@@ -923,7 +928,7 @@ public final class SmcGraphGenerator
                     {
                         arg = (it.next()).trim();
 
-                        _transitionSource.print(sep);
+                        source.print(sep);
 
                         // If the argument is a quoted string, then
                         // the quotes must be escaped.
@@ -933,15 +938,15 @@ public final class SmcGraphGenerator
 
                         // Then replace all double quotes with
                         // a backslash double qoute.
-                        _transitionSource.print(
+                        source.print(
                             arg.replaceAll("\"", "\\\\\""));
                     }
 
-                    _transitionSource.print(")");
+                    source.print(")");
                 }
             }
 
-            _transitionSource.print(";\\l");
+            source.print(";\\l");
         }
 
         return;
@@ -1051,13 +1056,13 @@ public final class SmcGraphGenerator
      * of the subgraphs <em>but</em> generated when outputing
      * the subgaphs.
      */
-    private final StringWriter _transitions;
+    private final ByteArrayOutputStream _transitions;
 
     /**
      * Encapsulates {@link #_transitions} for easier transition
      * output.
      */
-    private final PrintWriter _transitionSource;
+    private final PrintStream _transitionSource;
 
     //-----------------------------------------------------------
     // Constants.
@@ -1068,6 +1073,12 @@ public final class SmcGraphGenerator
      */
     private static final String INDENT_ACTION =
         "&nbsp;&nbsp;&nbsp;";
+
+    /**
+     * Set the transition output stream size to {@value} bytes
+     * initially.
+     */
+    private static final int TRANSITION_OUTPUT_SIZE = 8192;
 } // end of class SmcGraphGenerator
 
 //

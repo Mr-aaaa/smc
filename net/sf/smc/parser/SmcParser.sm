@@ -812,6 +812,10 @@ StateStartError
 } // end of state StateStartError
 
 EntryStart
+    Entry
+    {
+        setEntryExitFlag(true);
+    }
 {
     LEFT_BRACE(token: SmcLexer.Token)
         EntryEnd/push(ActionMap::Start)
@@ -828,6 +832,10 @@ EntryStart
 } // end of state EntryStart
 
 EntryEnd
+    Exit
+    {
+        setEntryExitFlag(false);
+    }
 {
     actionsDone(actions: List<SmcAction>, lineNumber: int)
         StateStart
@@ -841,6 +849,10 @@ EntryEnd
 } // end of state EntryEnd
 
 ExitStart
+    Entry
+    {
+        setEntryExitFlag(true);
+    }
 {
     LEFT_BRACE(token: SmcLexer.Token)
         ExitEnd/push(ActionMap::Start)
@@ -857,6 +869,10 @@ ExitStart
 } // end of state ExitStart
 
 ExitEnd
+    Exit
+    {
+        setEntryExitFlag(false);
+    }
 {
     actionsDone(actions: List<SmcAction>, lineNumber: int)
         StateStart
@@ -1799,7 +1815,8 @@ Start
         ActionName
         {
             createAction(token.getValue(),
-                         token.getLineNumber());
+                         token.getLineNumber(),
+                         ctxt.getEntryExitFlag());
         }
 
     RIGHT_BRACE(token: SmcLexer.Token)

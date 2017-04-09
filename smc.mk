@@ -40,7 +40,7 @@
 # Macros.
 #
 
-VERSION=        6_6_1
+VERSION=        6_6_2
 
 STAGING_DIR=    ../staging
 SMC_STAGING_DIR=$(STAGING_DIR)/smc
@@ -72,7 +72,7 @@ DOC_SOURCES=	./doc_sources.txt
 WINDOW_TITLE=	'SMC v. $(DOC_VERSION) API Specification'
 DOC_TITLE=	'SMC v. $(DOC_VERSION) API Specification'
 HEADER=		'<b>SMC</b><br><font size="-1">$(DOC_VERSION)</font>'
-FOOTER=		'<font size=-1>Copyright &copy; 2015. Charles W. Rapp. All Rights Reserved. Use is subject to <a href=\"https://www.mozilla.org/en-US/MPL/1.1/\">license terms</a>.</font>'
+FOOTER=		'<font size=-1>Copyright &copy; 2017. Charles W. Rapp. All Rights Reserved. Use is subject to <a href=\"https://www.mozilla.org/en-US/MPL/1.1/\">license terms</a>.</font>'
 OVERVIEW=	./overview.html
 
 JAVADOC_FLAGS=	-protected \
