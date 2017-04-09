@@ -2,6 +2,36 @@
 
                                SMC
                      The State Machine Compiler
+                         (Version: 6.6.2)
+
+                     http://smc.sourceforge.net
+
+
+
+0. What's New?
+--------------
+
+Major changes:
+
+None.
+
+
+Minor changes:
+
+None.
+
+
+Bug Fixes:
+
+(Graphviz)
+    -glevel 1 and -glevel 2 now generate valid .dot files.
+    Fixes errors introduced by SMC bug 211 fix.
+    (SF bug 213)
+
+
+
+                               SMC
+                     The State Machine Compiler
                          (Version: 6.6.1)
 
                      http://smc.sourceforge.net
