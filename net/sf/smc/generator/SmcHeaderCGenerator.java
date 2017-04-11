@@ -333,7 +333,9 @@ public final class SmcHeaderCGenerator
             _source.print("#define ");
             _source.print(fsmClassName);
             _source.println("_EnterStartState(fsm) \\");
-            _source.println("    ENTRY_STATE(getState(fsm))");
+            _source.println("    if (getState(fsm)->Entry != NULL) { \\");
+            _source.println("        getState(fsm)->Entry(fsm); \\");
+            _source.println("    }");
         }
 
         // Generate a method for every transition in every map
