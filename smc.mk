@@ -40,7 +40,7 @@
 # Macros.
 #
 
-VERSION=        6_6_2
+VERSION=        6_6_3
 
 STAGING_DIR=    ../staging
 SMC_STAGING_DIR=$(STAGING_DIR)/smc

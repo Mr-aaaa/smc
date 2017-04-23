@@ -63,13 +63,18 @@ public final class SmcParameter
      * @param lineNumber where the parameter is defined in the
      * .sm file.
      * @param type the parameter type.
+     * @param inSubgraph {@code true} if this element appears in
+     * a DOT file subgraph.
      */
-    public SmcParameter(String name, int lineNumber, String type)
+    public SmcParameter(final String name,
+                         final int lineNumber,
+                         final String type,
+                         final boolean inSubgraph)
     {
-        super (name, lineNumber);
+        super (name, lineNumber, inSubgraph);
 
         _type = type;
-    } // end of SmcParameter(String, int, String)
+    } // end of SmcParameter(String, int, String, boolean)
 
     //
     // end of Constructors.
@@ -155,6 +160,17 @@ public final class SmcParameter
 
         return;
     } // end of setType(String)
+
+    /**
+     * Updates the "in subgraph" flag to the given flag.
+     * @param flag {@code true} if this is an inner loopback
+     * transition parameter.
+     */
+    public void setInSubgraph(final boolean flag)
+    {
+        _inSubgraph = flag;
+        return;
+    } // end of setInSubgraph(boolean)
 
     //
     // end of Set methods.

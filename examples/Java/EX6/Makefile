@@ -84,6 +84,8 @@ SMC_FLAGS=      $(TARGET_LANG) $(TRACE) $(SERIAL) $(SYNC) $(REFLECT) $(GENERIC)
 
 FSM_LIB_DIR=    ../../../lib/Java
 
+GRAPH_LEVEL=   1
+
 RM_F=           rm -f
 RM_RF=          rm -rf
 
@@ -97,7 +99,7 @@ all :           $(TARGET)
 		$(SMC) $(SMC_FLAGS) $<
 
 %_sm.dot :      %.sm
-		$(SMC) -graph -glevel 1 $<
+		$(SMC) -graph -glevel $(GRAPH_LEVEL) $<
 
 %_sm.png :      %_sm.dot
 		dot -T png -o $@ $<

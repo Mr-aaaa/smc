@@ -106,12 +106,17 @@ public final class SmcGuard
      * @param lineNumber where this guard appears in the .sm
      * file.
      * @param transition guard belongs to this transition.
+     * @param inSubgraph {@code true} if this element appears in
+     * a DOT file subgraph.
      */
-    public SmcGuard(String cond,
-                    int lineNumber,
-                    SmcTransition transition)
+    public SmcGuard(final String cond,
+                    final int lineNumber,
+                    final SmcTransition transition,
+                    final boolean inSubgraph)
     {
-        super (transition.getName(), lineNumber);
+        super (transition.getName(),
+               lineNumber,
+               inSubgraph);
 
         _transition = transition;
         _condition = cond;
@@ -305,7 +310,30 @@ public final class SmcGuard
      */
     public void setTransType(TransType transType)
     {
+        final boolean inSubgraph = _inSubgraph;
+
         _transType = transType;
+
+        // If the end state is "nil", then this is an inner loop
+        // transition. This means that when a Graphviz dot file is
+        // generated, the transition appears inside the state
+        // graphic rather than as a transition arrow. Since
+        // Entry/Exit actions also appear within the state
+        // graphic, marking this transition as an Entry/Exit
+        // action gets the job done.
+        // Push transitions with a "nil" state are *not* in the
+        // subgraph.
+        _inSubgraph = (_endState.equals(NIL_STATE) == true &&
+                       _transType != TransType.TRANS_PUSH);
+
+        // If this guard is in the subgraph, then so is the
+        // transition - but do the update only if the value
+        // changed.
+        if (_inSubgraph != inSubgraph)
+        {
+            _transition.setInSubgraph(_inSubgraph);
+        }
+
         return;
     } // end of setTransType(TransType)
 
@@ -315,7 +343,30 @@ public final class SmcGuard
      */
     public void setEndState(String endState)
     {
+        final boolean inSubgraph = _inSubgraph;
+
         _endState = endState;
+
+        // If the end state is "nil", then this is an inner loop
+        // transition. This means that when a Graphviz dot file is
+        // generated, the transition appears inside the state
+        // graphic rather than as a transition arrow. Since
+        // Entry/Exit actions also appear within the state
+        // graphic, marking this transition as an Entry/Exit
+        // action gets the job done.
+        // Push transitions with a "nil" state are *not* in the
+        // subgraph.
+        _inSubgraph = (_endState.equals(NIL_STATE) == true &&
+                       _transType != TransType.TRANS_PUSH);
+
+        // If this guard is in the subgraph, then so is the
+        // transition. - but do the update only if the value
+        // changed.
+        if (_inSubgraph != inSubgraph)
+        {
+            _transition.setInSubgraph(_inSubgraph);
+        }
+
         return;
     } // end of setEndState(String)
 

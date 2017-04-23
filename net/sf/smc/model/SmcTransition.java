@@ -80,13 +80,16 @@ public final class SmcTransition
                          final int lineNumber,
                          final SmcState state)
     {
-        super (name, lineNumber);
+        // Since there is no Graphviz output associated with a
+        // transition but only with transition guards, set the
+        // "in subgraph" to false since it is ignored.
+        super (name, lineNumber, false);
 
         _state = state;
         _parameters = parameters;
         _identifier = transId;
         _guards = new ArrayList<SmcGuard>();
-    } // end of SmcTransition(String, List<>, int, SmcState)
+    } // end of SmcTransition(String,List<>,int,SmcState,boolean)
 
     //
     // end of Constructors.
@@ -244,11 +247,30 @@ public final class SmcTransition
      * Adds a guard to the list.
      * @param guard add this guard.
      */
-    public void addGuard(SmcGuard guard)
+    public void addGuard(final SmcGuard guard)
     {
         _guards.add(guard);
         return;
     } // end of addGuard(SmcGuard)
+
+    /**
+     * Updates the "in subgraph" flag to the given flag.
+     * @param flag {@code true} if this is an inner loopback
+     * transition.
+     */
+    public void setInSubgraph(final boolean flag)
+    {
+        _inSubgraph = flag;
+
+        // If this transition is in the subgraph, then so are the
+        // transition parameters.
+        for (SmcParameter param : _parameters)
+        {
+            param.setInSubgraph(_inSubgraph);
+        }
+
+        return;
+    } // end of setInSubgraph(boolean)
 
     //
     // end of Set methods.

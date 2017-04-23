@@ -71,12 +71,17 @@ public abstract class SmcElement
      * @param name the elements unique name.
      * @param lineNumber where this element appears in the .sm
      * file.
+     * @param inSubgraph {@code true} if this element appears in
+     * a DOT file subgraph.
      */
-    protected SmcElement(String name, int lineNumber)
+    protected SmcElement(final String name,
+                         final int lineNumber,
+                         final boolean inSubgraph)
     {
         _name = name;
         _lineNumber = lineNumber;
-    } // end of SmcElement(String, int)
+        _inSubgraph = inSubgraph;
+    } // end of SmcElement(String, int, boolean)
 
     //
     // end of Constructors.
@@ -118,6 +123,17 @@ public abstract class SmcElement
     {
         return(_lineNumber);
     } // end of getLineNumber()
+
+    /**
+     * Returns {@code true} if this element appears in a
+     * subgraph; otherwise returns {@code false} if appears after
+     * subgraph definitions.
+     * @return {@code true} if this is a subgraph element.
+     */
+    public boolean isInSubgraph()
+    {
+        return (_inSubgraph);
+    } // end of isInSubgraph()
 
     //
     // end of Get methods.
@@ -229,6 +245,20 @@ public abstract class SmcElement
      * file.
      */
     protected final int _lineNumber;
+
+    /**
+     * Set to {@code true} if this element appears in a subgraph;
+     * otherwise, set to {@code false} if this element appears
+     * after the subgraphs are defined.
+     * <p>
+     * This is not final because transition guards don't know
+     * whether they are in a subgraph or not until the end state
+     * is set. If the guard is an inner loopback transition
+     * (has a "nil" end state), then the transition is defined
+     * in the state subgraph rather than outside.
+     * </p>
+     */
+    protected boolean _inSubgraph;
 
     //-----------------------------------------------------------
     // Constants.

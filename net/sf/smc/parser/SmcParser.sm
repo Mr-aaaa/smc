@@ -814,7 +814,7 @@ StateStartError
 EntryStart
     Entry
     {
-        setEntryExitFlag(true);
+        setInSubgraph(true);
     }
 {
     LEFT_BRACE(token: SmcLexer.Token)
@@ -834,7 +834,7 @@ EntryStart
 EntryEnd
     Exit
     {
-        setEntryExitFlag(false);
+        setInSubgraph(false);
     }
 {
     actionsDone(actions: List<SmcAction>, lineNumber: int)
@@ -851,7 +851,7 @@ EntryEnd
 ExitStart
     Entry
     {
-        setEntryExitFlag(true);
+        setInSubgraph(true);
     }
 {
     LEFT_BRACE(token: SmcLexer.Token)
@@ -871,7 +871,7 @@ ExitStart
 ExitEnd
     Exit
     {
-        setEntryExitFlag(false);
+        setInSubgraph(false);
     }
 {
     actionsDone(actions: List<SmcAction>, lineNumber: int)
@@ -958,7 +958,7 @@ TransStart
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_PUSH);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     POP(token: SmcLexer.Token)
@@ -1038,7 +1038,7 @@ TransStartError
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_PUSH);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     POP(token: SmcLexer.Token)
@@ -1057,7 +1057,7 @@ TransStartError
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_SET);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     // One way or another this transition is now kaput.
@@ -1121,7 +1121,7 @@ TransNext
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_PUSH);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     POP(token: SmcLexer.Token)
@@ -1140,7 +1140,7 @@ TransNext
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_SET);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     // This word is the end state. Now get the actions.
@@ -1181,7 +1181,7 @@ TransNextError
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_PUSH);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     POP(token: SmcLexer.Token)
@@ -1200,7 +1200,7 @@ TransNextError
                         "",
                         token.getLineNumber());
             setTransType(TransType.TRANS_SET);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     WORD(token: SmcLexer.Token)
@@ -1250,7 +1250,7 @@ EndState
         PushStart
         {
             setTransType(TransType.TRANS_PUSH);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     POP(token: SmcLexer.Token)
@@ -1263,7 +1263,7 @@ EndState
         JumpStart
         {
             setTransType(TransType.TRANS_SET);
-            setEndState("nil");
+            setEndState(SmcParser.NIL_STATE);
         }
 
     WORD(token: SmcLexer.Token)
@@ -1816,7 +1816,7 @@ Start
         {
             createAction(token.getValue(),
                          token.getLineNumber(),
-                         ctxt.getEntryExitFlag());
+                         ctxt.getInSubgraph());
         }
 
     RIGHT_BRACE(token: SmcLexer.Token)

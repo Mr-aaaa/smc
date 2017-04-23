@@ -72,7 +72,8 @@ public final class SmcMap
                   final int lineNumber,
                   final SmcFSM fsm)
     {
-        super (name, lineNumber);
+        // Subgraphs are maps, so a map appears in a subgraph.
+        super (name, lineNumber, true);
 
         _fsm = fsm;
         _defaultState = null;

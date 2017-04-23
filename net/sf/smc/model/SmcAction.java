@@ -87,16 +87,15 @@ public final class SmcAction
      * FSM context method.
      * @param lineNumber where the action appears in the .sm
      * file.
-     * @param entryExitFlag {@code true} if this action appears
-     * in a state's entry or exit block.
+     * @param inSubgraph {@code true} if this action appears
+     * in a subgraph.
      */
     public SmcAction(final String name,
                      final int lineNumber,
-                     final boolean entryExitFlag)
+                     final boolean inSubgraph)
     {
-        super (name, lineNumber);
+        super (name, lineNumber, inSubgraph);
 
-        _entryExitFlag = entryExitFlag;
         _arguments = null;
         _propertyFlag = false;
         _staticFlag = false;
@@ -108,8 +107,8 @@ public final class SmcAction
      * FSM context method.
      * @param lineNumber where the action appears in the .sm
      * file.
-     * @param entryExitFlag {@code true} if this action appears
-     * in a state's entry or exit block.
+     * @param inSubgraph {@code true} if this action appears
+     * in a subgraph.
      * @param propertyFlag if {@code true}, then this action is
      * a .Net property assignment and {@code arguments} must be
      * a non-{@code null} list with exactly one item.
@@ -122,12 +121,12 @@ public final class SmcAction
      */
     public SmcAction(final String name,
                      final int lineNumber,
-                     final boolean entryExitFlag,
+                     final boolean inSubgraph,
                      final boolean propertyFlag,
                      final List<String> arguments)
         throws IllegalArgumentException
     {
-        super (name, lineNumber);
+        super (name, lineNumber, inSubgraph);
 
         if (propertyFlag == true &&
             (arguments == null ||
@@ -139,11 +138,10 @@ public final class SmcAction
         }
         else
         {
-            _entryExitFlag = entryExitFlag;
             _arguments = arguments;
             _propertyFlag = propertyFlag;
         }
-    } // end of SmcAction(String, boolean, List<String>, int)
+    } // end of SmcAction(...)
 
     //
     // end of Constructors.
@@ -218,17 +216,6 @@ public final class SmcAction
     //-----------------------------------------------------------
     // Get methods.
     //
-
-    /**
-     * Returns {@code true} if this action appears in a state
-     * entry or exit block; otherwise returns {@code false} if
-     * this is a transition action.
-     * @return {@code true} if this is an entry/exit action.
-     */
-    public boolean isEntryExitAction()
-    {
-        return (_entryExitFlag);
-    } // end of isEntryExitAction()
 
     /**
      * Returns {@code true} if this action is a .Net property
@@ -366,16 +353,6 @@ public final class SmcAction
 //---------------------------------------------------------------
 // Member Data
 //
-
-    /**
-     * Set to {@code true} if this action appears in a state
-     * entry or exit block; otherwise, set to {@code false} if
-     * this is a transition action. The reason for
-     * differentiating between the two is that entry/exit
-     * actions appear in the node subgraph definition while
-     * transition actions are defined after the subgraphs.
-     */
-    private final boolean _entryExitFlag;
 
     // The action's argument list.
     private List<String> _arguments;

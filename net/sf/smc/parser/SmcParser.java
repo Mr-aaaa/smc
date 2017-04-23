@@ -98,7 +98,7 @@ public final class SmcParser
         _messages = new ArrayList<>();
         _transitions = new HashMap<>();
         _nextTransitionId = 1;
-        _entryExitFlag = false;
+        _inSubgraph = false;
 
         _lexer = new SmcLexer(istream, debugFlag);
         _parserFSM = new SmcParserContext(this);
@@ -870,7 +870,10 @@ public final class SmcParser
                 PrintStream os = _parserFSM.getDebugStream();
 
                 os.println("CREATE GUARD : " +
+                           transition +
+                           "[" +
                            condition +
+                           "]" +
                            "(" +
                            Integer.toString(lineNumber) +
                            ")");
@@ -879,7 +882,8 @@ public final class SmcParser
             _guardInProgress =
                 new SmcGuard(condition,
                              lineNumber,
-                             _transitionInProgress);
+                             _transitionInProgress,
+                             _inSubgraph);
         }
 
         return;
@@ -903,6 +907,8 @@ public final class SmcParser
                 case TRANS_PUSH:
                 case TRANS_POP:
                     _guardInProgress.setTransType(trans_type);
+                    setInSubgraph(
+                        _guardInProgress.isInSubgraph());
                     break;
 
                 default:
@@ -915,7 +921,7 @@ public final class SmcParser
         }
 
         return;
-    }
+    } // end of setTransType(TransType)
 
     // Set the in-progress guard's end state.
     /* package */ void setEndState(String state)
@@ -929,6 +935,7 @@ public final class SmcParser
         else
         {
             _guardInProgress.setEndState(state);
+            setInSubgraph(_guardInProgress.isInSubgraph());
         }
 
         return;
@@ -950,9 +957,9 @@ public final class SmcParser
                   "transition.",
                   _lineNumber);
         }
-        else if (name.equals("nil") == true)
+        else if (name.equals(NIL_STATE) == true)
         {
-            error("Cannot push to \"nil\" state.",
+            error("Cannot push to \"" + NIL_STATE + "\" state.",
                   _lineNumber);
         }
         else
@@ -1047,7 +1054,8 @@ public final class SmcParser
             }
 
             _paramInProgress =
-                new SmcParameter(name, lineNumber, type);
+                new SmcParameter(
+                    name, lineNumber, type, _inSubgraph);
         }
 
         return;
@@ -1326,16 +1334,28 @@ public final class SmcParser
         return;
     } // end of clearArguments()
 
-    /* package */ boolean getEntryExitFlag()
+    /* package */ boolean getInSubgraph()
     {
-        return (_entryExitFlag);
-    } // end of getEntryExitFlag()
+        return (_inSubgraph);
+    } // end of getInSubgraph()
 
-    /* package */ void setEntryExitFlag(final boolean flag)
+    /* package */ void setInSubgraph(final boolean flag)
     {
-        _entryExitFlag = flag;
+        if (_parserFSM.getDebugFlag() == true)
+        {
+            PrintStream os = _parserFSM.getDebugStream();
+
+            os.println("SET IN SUBGRAPH : " +
+                       flag +
+                       "(" +
+                       Integer.toString(_lineNumber) +
+                       ")");
+        }
+
+        _inSubgraph = flag;
+
         return;
-    } // end of setEntryExitFlag(boolean)
+    } // end of setInSubgraph(boolean)
 
     //
     // end of State Machine Actions
@@ -1714,9 +1734,11 @@ public final class SmcParser
     private String _argInProgress;
 
     // Set to true if the action currently being parsed is in a
-    // state entry or exit block; false if it is a transition
-    // action.
-    private boolean _entryExitFlag;
+    // state and false if not. States contain:
+    // + Entry actions.
+    // + Exit actions
+    // + Internal loopback transitions.
+    private boolean _inSubgraph;
 
     // Store parsed parameters here.
     private List<SmcParameter> _paramList;
@@ -1753,6 +1775,16 @@ public final class SmcParser
     // table to get the appropriate transition method and
     // invoke that method.
     private static Method[] _TransMethod;
+
+    //-----------------------------------------------------------
+    // Constants.
+    //
+
+    /**
+     * The restricted keyword name for the inner loop next state
+     * is {@value}.
+     */
+    public static final String NIL_STATE = "nil";
 
     static
     {

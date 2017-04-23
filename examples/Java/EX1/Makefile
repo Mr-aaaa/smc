@@ -64,6 +64,8 @@ JAVAC_FLAGS=    -g -Xlint -classpath ../../../lib/Java/statemap.jar
 JAVA=           java
 JAVA_FLAGS=     -classpath .:../../../lib/Java/statemap.jar
 
+GRAPH_LEVEL=   1
+
 RM_F=           rm -f
 
 #################################################################
@@ -74,7 +76,7 @@ RM_F=           rm -f
 		$(SMC) $(SMC_FLAGS) $<
 
 %_sm.dot :      %.sm
-		$(SMC) -graph -glevel 1 $<
+		$(SMC) -graph -glevel $(GRAPH_LEVEL) $<
 
 %_sm.png :      %_sm.dot
 		dot -T png -o $@ $<

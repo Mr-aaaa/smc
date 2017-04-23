@@ -100,7 +100,9 @@ public final class SmcFSM
     public SmcFSM(final String name, final String targetFile)
     {
         // The abstract syntax tree always starts on line 1.
-        super (name, 1);
+        // Also, the entire FSM should be placed into the
+        // "subgraph" section since it needs to output first.
+        super (name, 1, true);
 
         _startState = "";
         _source = "";

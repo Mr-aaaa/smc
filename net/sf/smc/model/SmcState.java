@@ -71,7 +71,8 @@ public final class SmcState
      */
     public SmcState(String name, int lineNumber, SmcMap map)
     {
-        super (name, lineNumber);
+        // States always appear in subgraphs.
+        super (name, lineNumber, true);
 
         _map = map;
 
