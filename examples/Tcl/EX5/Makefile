@@ -29,10 +29,9 @@
 # Macros.
 #
 
-SM_SOURCES=     TASK.SM \
+SM_SOURCES=     Task.sm \
                 taskManager.sm
-SOURCES=        $(SM_SOURCES:%.sm=%_sm.tcl) \
-                $(SM_SOURCES:%.SM=%_sm.tcl)
+SOURCES=        $(SM_SOURCES:%.sm=%_sm.tcl)
 TARGET=         TaskMan
 
 # Uncomment to turn on debug message generation.
@@ -56,13 +55,7 @@ RM_F=           rm -f
 %_sm.tcl :      %.sm
 		$(SMC) $(SMC_FLAGS) $<
 
-%_sm.tcl :      %.SM
-		$(SMC) $(SMC_FLAGS) $<
-
 %_sm.dot :      %.sm
-		$(SMC) -graph -glevel 1 $<
-
-%_sm.dot :      %.SM
 		$(SMC) -graph -glevel 1 $<
 
 %_sm.png :      %_sm.dot
@@ -71,21 +64,18 @@ RM_F=           rm -f
 %_sm.html :     %.sm
 		$(SMC) -table $<
 
-%_sm.html :     %.SM
-		$(SMC) -table $<
-
 all :           $(TARGET)
 
 $(TARGET) :     $(SOURCES)
 
 test :          $(SOURCES)
-		wish TASKMAN.TCL
+		wish taskMan.tcl
 
-graph :         $(SM_SOURCES:%.sm=%_sm.dot) $(SM_SOURCES:%.SM=%_sm.dot)
+graph :         $(SM_SOURCES:%.sm=%_sm.dot)
 
-png :           $(SM_SOURCES:%.sm=%_sm.png) $(SM_SOURCES:%.SM=%_sm.png)
+png :           $(SM_SOURCES:%.sm=%_sm.png)
 
-table :         $(SM_SOURCES:%.sm=%_sm.html) $(SM_SOURCES:%.SM=%_sm.html)
+table :         $(SM_SOURCES:%.sm=%_sm.html)
 
 clean :
 		-$(RM_F) *_sm.tcl

@@ -43,7 +43,7 @@
 
 package require statemap;
 
-source ./stoplight_sm.tcl;
+source ./Stoplight_sm.tcl;
 
 namespace eval tcl_ex4 {
     class Stoplight {
@@ -77,7 +77,7 @@ namespace eval tcl_ex4 {
 
     # Member functions.
         constructor {canvas} {
-            set _fsm [::tcl_ex4::stoplightContext #auto $this];
+            set _fsm [::tcl_ex4::StoplightContext #auto $this];
 
             set _canvas $canvas;
             

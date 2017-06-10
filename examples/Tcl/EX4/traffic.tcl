@@ -57,8 +57,8 @@ namespace import ::itcl::*;
 namespace import ::statemap::*;
 
 # Load in the stoplight and vehicles classes.
-source ./stoplight.tcl;
-source ./VEHICLE.TCL;
+source ./Stoplight.tcl;
+source ./Vehicle.tcl;
 namespace import ::tcl_ex4::*;
 
 # DEBUG

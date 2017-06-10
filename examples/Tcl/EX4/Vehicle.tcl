@@ -43,7 +43,7 @@
 
 package require statemap;
 
-source ./VEHICLE_sm.tcl;
+source ./Vehicle_sm.tcl;
 
 namespace eval ::tcl_ex4 {
     class Vehicle {
@@ -88,7 +88,7 @@ namespace eval ::tcl_ex4 {
 
     # Member functions.
         constructor {stoplight direction canvas} {
-            set _fsm [::tcl_ex4::VEHICLEContext #auto $this];
+            set _fsm [::tcl_ex4::VehicleContext #auto $this];
 
             set _canvas $canvas;
             set _direction $direction;

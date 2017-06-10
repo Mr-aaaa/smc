@@ -96,7 +96,7 @@ proc init {argc argv} {
     namespace import ::statemap::*;
 
     # Load in the class definitions.
-    source ./TASK.TCL;
+    source ./Task.tcl;
     source ./taskManager.tcl;
     source ./taskGUI.tcl;
     source ./messageGUI.tcl;
