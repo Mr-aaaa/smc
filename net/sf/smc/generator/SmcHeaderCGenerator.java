@@ -321,10 +321,12 @@ public final class SmcHeaderCGenerator
         _source.print("#define ");
         _source.print(fsmClassName);
         _source.println("_Init(fsm, owner) \\");
-        _source.print("    FSM_INIT((fsm), &");
+        _source.println("    do { \\");
+        _source.print("        FSM_INIT((fsm), &");
         _source.print(cState);
         _source.println("); \\");
-        _source.println("    (fsm)->_owner = (owner)");
+        _source.println("        (fsm)->_owner = (owner); \\");
+        _source.println("    } while (0)");
 
         // EnterStartState method.
         if (fsm.hasEntryActions() == true)
@@ -333,9 +335,11 @@ public final class SmcHeaderCGenerator
             _source.print("#define ");
             _source.print(fsmClassName);
             _source.println("_EnterStartState(fsm) \\");
-            _source.println("    if (getState(fsm)->Entry != NULL) { \\");
-            _source.println("        getState(fsm)->Entry(fsm); \\");
-            _source.println("    }");
+            _source.println("    do { \\");
+            _source.println("        if (getState(fsm)->Entry != NULL) { \\");
+            _source.println("            getState(fsm)->Entry(fsm); \\");
+            _source.println("        } \\");
+            _source.println("    } while (0)");
         }
 
         // Generate a method for every transition in every map
@@ -358,12 +362,12 @@ public final class SmcHeaderCGenerator
                     _source.print(param.getName());
                 }
                 _source.println(") \\");
-
-                _source.println("    assert(getState(fsm) != NULL); \\");
-                _source.print("    setTransition((fsm), \"");
+                _source.println("    do { \\");
+                _source.println("        assert(getState(fsm) != NULL); \\");
+                _source.print("        setTransition((fsm), \"");
                 _source.print(trans.getName());
                 _source.println("\"); \\");
-                _source.print("    getState(fsm)->");
+                _source.print("        getState(fsm)->");
                 _source.print(trans.getName());
                 _source.print("((fsm)");
                 for (SmcParameter param: params)
@@ -373,7 +377,8 @@ public final class SmcHeaderCGenerator
                     _source.print(")");
                 }
                 _source.println("); \\");
-                _source.println("    setTransition((fsm), NULL)");
+                _source.println("        setTransition((fsm), NULL); \\");
+                _source.println("    } while (0)");
             }
         }
 
