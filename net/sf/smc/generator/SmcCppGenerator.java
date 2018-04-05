@@ -615,7 +615,7 @@ public final class SmcCppGenerator
                 _source.print(">");
             }
             _source.println("& context)");
-            _source.println();
+            _source.print(_indent);
             _source.println("{");
 
             // Declare the "ctxt" local variable.
