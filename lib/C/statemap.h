@@ -60,7 +60,7 @@
 #define STATE_MEMBERS_DEBUG \
     const char *_name;
 #define getName(state) \
-    (state)->_name
+    ((state)->_name)
 #else
 #define STATE_MEMBERS_DEBUG
 #endif
@@ -70,7 +70,7 @@
     STATE_MEMBERS_DEBUG
 
 #define getId(state) \
-    (state)->_id
+    ((state)->_id)
 
 #define State_Default(fsm) \
     assert(0)
@@ -80,28 +80,40 @@
     const char * _transition; \
     int _debug_flag;
 #define FSM_INIT_DEBUG(fsm) \
-    (fsm)->_transition = NULL; \
-    (fsm)->_debug_flag = 0
+    do { \
+        (fsm)->_transition = NULL; \
+        (fsm)->_debug_flag = 0; \
+    } while (0)
 #define setTransition(fsm, transition) \
-    (fsm)->_transition = (transition)
+    do { \
+        (fsm)->_transition = (transition); \
+    } while (0)
 #define getTransition(fsm) \
-    (fsm)->_transition
+    ((fsm)->_transition)
 #define getDebugFlag(fsm) \
-    (fsm)->_debug_flag
+    ((fsm)->_debug_flag)
 #define setDebugFlag(fsm, flag) \
-    (fsm)->_debug_flag = (flag)
+    do { \
+        (fsm)->_debug_flag = (flag); \
+    } while (0)
 #define setState_debug(fsm, state) \
-    if ((fsm)->_debug_flag != 0) { \
-        TRACE("ENTER STATE     : %s\n", getName(state)); \
-    }
+    do { \
+        if ((fsm)->_debug_flag != 0) { \
+            TRACE("ENTER STATE     : %s\n", getName(state)); \
+        } \
+    } while (0)
 #define pushState_debug(fsm, state) \
-    if ((fsm)->_debug_flag != 0) { \
-        TRACE("PUSH TO STATE   : %s\n", getName(state)); \
-    }
+    do { \
+        if ((fsm)->_debug_flag != 0) { \
+            TRACE("PUSH TO STATE   : %s\n", getName(state)); \
+        } \
+    } while (0)
 #define popState_debug(fsm) \
-    if ((fsm)->_debug_flag != 0) { \
-        TRACE("POP TO STATE    : %s\n", getName((fsm)->_state)); \
-    }
+    do { \
+        if ((fsm)->_debug_flag != 0) { \
+            TRACE("POP TO STATE    : %s\n", getName((fsm)->_state)); \
+        } \
+    } while (0)
 #else
 #define FSM_MEMBERS_DEBUG
 #define FSM_INIT_DEBUG(fsm)
@@ -123,39 +135,53 @@
     FSM_MEMBERS_DEBUG
 
 #define FSM_INIT(fsm, state)    \
-    (fsm)->_state = (state); \
-    (fsm)->_previous_state = NULL; \
-    (fsm)->_stack_start = NULL; \
-    (fsm)->_stack_curr = NULL; \
-    (fsm)->_stack_max = NULL; \
-    FSM_INIT_DEBUG(fsm)
+    do { \
+        (fsm)->_state = (state); \
+        (fsm)->_previous_state = NULL; \
+        (fsm)->_stack_start = NULL; \
+        (fsm)->_stack_curr = NULL; \
+        (fsm)->_stack_max = NULL; \
+        FSM_INIT_DEBUG(fsm); \
+    } while (0)
 
 #define FSM_STACK(fsm, stack) \
-    (fsm)->_stack_start = &(stack)[0]; \
-    (fsm)->_stack_curr = &(stack)[0]; \
-    (fsm)->_stack_max = &(stack)[0] + (sizeof(stack) / sizeof(void*))
+    do { \
+        (fsm)->_stack_start = &(stack)[0]; \
+        (fsm)->_stack_curr = &(stack)[0]; \
+        (fsm)->_stack_max = &(stack)[0] + (sizeof(stack) / sizeof(void*)); \
+    } while (0)
 
 #define getState(fsm) \
-    (fsm)->_state
+    ((fsm)->_state)
 #define clearState(fsm) \
-    (fsm)->_previous_state = (fsm)->_state; \
-    (fsm)->_state = NULL
+    do { \
+        (fsm)->_previous_state = (fsm)->_state; \
+        (fsm)->_state = NULL; \
+    } while (0)
 #define setState(fsm, state) \
-    (fsm)->_state = (state); \
-    setState_debug(fsm, state)
+    do { \
+        (fsm)->_state = (state); \
+        setState_debug(fsm, state); \
+    } while (0)
 #define pushState(fsm, state) \
-    if ((fsm)->_stack_curr >= (fsm)->_stack_max) { \
-        assert(0 == "STACK OVERFLOW"); \
-    } \
-    *((fsm)->_stack_curr) = (fsm)->_state; \
-    (fsm)->_stack_curr ++; \
-    (fsm)->_state = state; \
-    pushState_debug(fsm, state)
+    do { \
+        if ((fsm)->_stack_curr >= (fsm)->_stack_max) { \
+            assert(0 == "STACK OVERFLOW"); \
+        } \
+        *((fsm)->_stack_curr) = (fsm)->_state; \
+        (fsm)->_stack_curr ++; \
+        (fsm)->_state = state; \
+        pushState_debug(fsm, state); \
+    } while (0)
 #define popState(fsm) \
-    (fsm)->_stack_curr --; \
-    (fsm)->_state = *((fsm)->_stack_curr); \
-    popState_debug(fsm)
+    do { \
+        (fsm)->_stack_curr --; \
+        (fsm)->_state = *((fsm)->_stack_curr); \
+        popState_debug(fsm); \
+    } while (0)
 #define emptyStateStack(fsm) \
-    (fsm)->_stack_curr = (fsm)->_stack_start
+    do { \
+        (fsm)->_stack_curr = (fsm)->_stack_start; \
+    } while (0)
 
 #endif

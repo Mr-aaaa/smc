@@ -180,23 +180,27 @@ public final class SmcCGenerator
         transList = fsm.getTransitions();
 
         _source.println();
-        _source.println("#define getOwner(fsm) (fsm)->_owner");
+        _source.println("#define getOwner(fsm) ((fsm)->_owner)");
 
         _source.println();
         if (fsm.hasEntryActions() == true)
         {
             _source.println("#define ENTRY_STATE(state) \\");
-            _source.println("    if ((state)->Entry != NULL) { \\");
-            _source.println("        (state)->Entry(fsm); \\");
-            _source.println("    }");
+            _source.println("    do { \\");
+            _source.println("        if ((state)->Entry != NULL) { \\");
+            _source.println("            (state)->Entry(fsm); \\");
+            _source.println("        } \\");
+            _source.println("    } while (0)");
         }
         _source.println();
         if (fsm.hasExitActions() == true)
         {
             _source.println("#define EXIT_STATE(state) \\");
-            _source.println("    if ((state)->Exit != NULL) { \\");
-            _source.println("        (state)->Exit(fsm); \\");
-            _source.println("    }");
+            _source.println("    do { \\");
+            _source.println("        if ((state)->Exit != NULL) { \\");
+            _source.println("            (state)->Exit(fsm); \\");
+            _source.println("        } \\");
+            _source.println("    } while (0)");
         }
 
         // Output the default transition definitions.
