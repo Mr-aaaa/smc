@@ -115,15 +115,33 @@
         } \
     } while (0)
 #else
+#ifndef FSM_MEMBERS_DEBUG
 #define FSM_MEMBERS_DEBUG
+#endif
+#ifndef FSM_INIT_DEBUG
 #define FSM_INIT_DEBUG(fsm)
+#endif
+#ifndef setTransition
 #define setTransition(fsm, transition)
+#endif
+#ifndef getTransition
 #define getTransition(fsm)
+#endif
+#ifndef getDebugFlag
 #define getDebugFlag(fsm)
+#endif
+#ifndef setDebugFlag
 #define setDebugFlag(fsm, flag)
+#endif
+#ifndef setState_debug
 #define setState_debug(fsm, state)
+#endif
+#ifndef pushState_debug
 #define pushState_debug(fsm, state)
+#endif
+#ifndef popState_debug
 #define popState_debug(fsm)
+#endif
 #endif
 
 #define FSM_MEMBERS(app) \
