@@ -175,6 +175,83 @@ public final class SmcCGenerator
         _source.print(_targetfileBase);
         _source.format(".%s\"%n", _headerSuffix);
 
+        _source.println();
+        _source.println("#if STATEMAP_NAMES_ONLY || STATEMAP_DEBUG");
+
+        // Print out lookup table for state names
+        String stateNamesTable = fsmClassName + "StateNamesTable";
+        _source.println();
+        _source.print("const char *const ");
+        _source.print(stateNamesTable);
+        _source.println("[] = {");
+        for (SmcMap map: fsm.getMaps())
+        {
+            for (SmcState state: map.getStates())
+            {
+                _source.print("    [");
+                _source.print(fsmClassName);
+                _source.print("StateIds_");
+                _source.print(map.getName());
+                _source.print("_");
+                _source.print(state.getInstanceName());
+                _source.print("] = \"");
+                _source.print(map.getName());
+                _source.print("::");
+                _source.print(state.getInstanceName());
+                _source.println("\",");
+            }
+        }
+        _source.println("};");
+        _source.println();
+        _source.print("const int ");
+        _source.print(stateNamesTable);
+        _source.println("Length =");
+        _source.print("    sizeof(");
+        _source.print(stateNamesTable);
+        _source.println(")/");
+        _source.print("    sizeof(");
+        _source.print(stateNamesTable);
+        _source.println("[0]);");
+
+        // Print out lookup table for transition names
+        String transitionNamesTable = fsmClassName + "TransitionNamesTable";
+        _source.println();
+        _source.print("const char *const ");
+        _source.print(transitionNamesTable);
+        _source.println("[] = {");
+        for (SmcTransition trans: fsm.getTransitions())
+        {
+            // Don't output the default state here.
+            if (trans.getName().equals("Default") == false)
+            {
+                _source.print("    [");
+                _source.print(fsmClassName);
+                _source.print("TransitionIds_");
+                _source.print(trans.getName());
+                _source.print("] = \"");
+                _source.print(trans.getName());
+                _source.println("\",");
+            }
+        }
+        _source.println("};");
+        _source.println();
+        _source.print("const int ");
+        _source.print(transitionNamesTable);
+        _source.println("Length =");
+        _source.print("    sizeof(");
+        _source.print(transitionNamesTable);
+        _source.println(")/");
+        _source.print("    sizeof(");
+        _source.print(transitionNamesTable);
+        _source.println("[0]);");
+
+        _source.println();
+        _source.println("#endif /* STATEMAP_NAMES_ONLY || STATEMAP_DEBUG */");
+
+        // Print out a macro gourd to build only name lookup-tables
+        _source.println();
+        _source.println("#if !STATEMAP_NAMES_ONLY");
+
         // Print out the default definitions for all the
         // transitions. First, get the transitions list.
         transList = fsm.getTransitions();
@@ -182,9 +259,9 @@ public final class SmcCGenerator
         _source.println();
         _source.println("#define getOwner(fsm) ((fsm)->_owner)");
 
-        _source.println();
         if (fsm.hasEntryActions() == true)
         {
+            _source.println();
             _source.println("#define ENTRY_STATE(state) \\");
             _source.println("    do { \\");
             _source.println("        if ((state)->Entry != NULL) { \\");
@@ -192,9 +269,9 @@ public final class SmcCGenerator
             _source.println("        } \\");
             _source.println("    } while (0)");
         }
-        _source.println();
         if (fsm.hasExitActions() == true)
         {
+            _source.println();
             _source.println("#define EXIT_STATE(state) \\");
             _source.println("    do { \\");
             _source.println("        if ((state)->Exit != NULL) { \\");
@@ -249,7 +326,7 @@ public final class SmcCGenerator
             _source.print("        TRACE(");
             _source.print("\"TRANSITION   : %s.%s\\n\", ");
             _source.println(
-                "getName(getState(fsm)), getTransition(fsm));");
+                "getName(fsm, getState(fsm)), getTransitionName(fsm, getTransition(fsm)));");
 
             _source.println("    }");
         }
@@ -400,9 +477,11 @@ public final class SmcCGenerator
                 _source.println();
 
                 _source.println("    assert(state != NULL);");
-                _source.print("    setTransition(fsm, \"");
+                _source.print("    setTransition(fsm, ");
+                _source.print(fsmClassName);
+                _source.print("TransitionIds_");
                 _source.print(trans.getName());
-                _source.println("\");");
+                _source.println(");");
                 _source.print("    state->");
                 _source.print(trans.getName());
                 _source.print("(fsm");
@@ -412,13 +491,17 @@ public final class SmcCGenerator
                     _source.print(param.getName());
                 }
                 _source.println(");");
-                _source.println("    setTransition(fsm, NULL);");
+                _source.println("    setTransition(fsm, 0);");
 
                 _source.println("}");
             }
         }
-        _source.println("#endif");
+        _source.print("#endif /* NO_");
+        _source.print(targetfileCaps);
+        _source.println("_MACRO */");
 
+        _source.println();
+        _source.println("#endif /* !STATEMAP_NAMES_ONLY */");
 
         _source.println();
         _source.println("/*");
@@ -439,6 +522,7 @@ public final class SmcCGenerator
     public void visit(SmcMap map)
     {
         String packageName = map.getFSM().getPackage();
+        String fsmClassName = map.getFSM().getFsmClassName();
         String context = map.getFSM().getContext();
         String mapName = map.getName();
         String transName;
@@ -449,6 +533,7 @@ public final class SmcCGenerator
         if (packageName != null && packageName.length() > 0)
         {
             context = packageName + "_" + context;
+            fsmClassName = packageName + "_" + fsmClassName;
             mapName = packageName + "_" + mapName;
         }
 
@@ -565,17 +650,16 @@ public final class SmcCGenerator
             _source.print("_");
             _source.print(stateName);
             _source.println("_Default,");
+
             _source.print("    ");
-            _source.print(SmcMap.getNextStateId());
-            if (_debugLevel >= DEBUG_LEVEL_0)
-            {
-                _source.print(", \"");
-                _source.print(mapName);
-                _source.print("_");
-                _source.print(stateName);
-                _source.print("\"");
-            }
-            _source.println("\n};");
+            _source.print(fsmClassName);
+            _source.print("StateIds_");
+            _source.print(map.getName());
+            _source.print("_");
+            _source.print(state.getInstanceName());
+
+            _source.println();
+            _source.println("};");
         }
 
         return;
@@ -1104,7 +1188,7 @@ public final class SmcCGenerator
             _source.print("    TRACE(\"ENTER TRANSITION: ");
             _source.print(mapName);
             _source.print("_");
-            _source.print(stateName);
+            _source.print(state.getInstanceName());
             _source.print(".");
             _source.print(transName);
             _source.print("(");
@@ -1162,7 +1246,7 @@ public final class SmcCGenerator
             _source.print("    TRACE(\"EXIT TRANSITION : ");
             _source.print(mapName);
             _source.print("_");
-            _source.print(stateName);
+            _source.print(state.getInstanceName());
             _source.print(".");
             _source.print(transName);
             _source.print("(");

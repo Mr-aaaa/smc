@@ -56,18 +56,12 @@
 #define TRACE printf
 #endif
 
-#ifdef STATEMAP_DEBUG
-#define STATE_MEMBERS_DEBUG \
-    const char *_name;
-#define getName(state) \
-    ((state)->_name)
-#else
-#define STATE_MEMBERS_DEBUG
+#ifndef STATEMAP_DEBUG
+#define STATEMAP_DEBUG 0
 #endif
 
 #define STATE_MEMBERS \
-    int _id; \
-    STATE_MEMBERS_DEBUG
+    int _id;
 
 #define getId(state) \
     ((state)->_id)
@@ -75,46 +69,65 @@
 #define State_Default(fsm) \
     assert(0)
 
-#ifdef STATEMAP_DEBUG
-#define FSM_MEMBERS_DEBUG \
-    const char * _transition; \
+#if STATEMAP_DEBUG
+
+#define FSM_MEMBERS_DEBUG    \
+    const char *const *_stateNames; \
+    const char *const *_transitionNames; \
+    int _transition; \
     int _debug_flag;
+
 #define FSM_INIT_DEBUG(fsm) \
     do { \
-        (fsm)->_transition = NULL; \
+        (fsm)->_transition = 0; \
         (fsm)->_debug_flag = 0; \
+        FSM_INIT_DEBUG_NAMES(fsm); \
     } while (0)
+
 #define setTransition(fsm, transition) \
     do { \
         (fsm)->_transition = (transition); \
     } while (0)
+
 #define getTransition(fsm) \
     ((fsm)->_transition)
+
 #define getDebugFlag(fsm) \
     ((fsm)->_debug_flag)
+
 #define setDebugFlag(fsm, flag) \
     do { \
         (fsm)->_debug_flag = (flag); \
     } while (0)
+
 #define setState_debug(fsm, state) \
     do { \
         if ((fsm)->_debug_flag != 0) { \
-            TRACE("ENTER STATE     : %s\n", getName(state)); \
+            TRACE("ENTER STATE     : %s\n", getName((fsm), (state))); \
         } \
     } while (0)
+
 #define pushState_debug(fsm, state) \
     do { \
         if ((fsm)->_debug_flag != 0) { \
-            TRACE("PUSH TO STATE   : %s\n", getName(state)); \
+            TRACE("PUSH TO STATE   : %s\n", getName((fsm), (state))); \
         } \
     } while (0)
+
 #define popState_debug(fsm) \
     do { \
         if ((fsm)->_debug_flag != 0) { \
-            TRACE("POP TO STATE    : %s\n", getName((fsm)->_state)); \
+            TRACE("POP TO STATE    : %s\n", getName((fsm), getState(fsm))); \
         } \
     } while (0)
-#else
+
+#define getName(fsm, state) \
+    ((fsm)->_stateNames[getId(state)])
+
+#define getTransitionName(fsm, transition)\
+    ((fsm)->_transitionNames[transition])
+
+#else /* STATEMAP_DEBUG */
 #ifndef FSM_MEMBERS_DEBUG
 #define FSM_MEMBERS_DEBUG
 #endif
@@ -142,7 +155,7 @@
 #ifndef popState_debug
 #define popState_debug(fsm)
 #endif
-#endif
+#endif /* STATEMAP_DEBUG */
 
 #define FSM_MEMBERS(app) \
     const struct app##State * _state; \
@@ -171,16 +184,19 @@
 
 #define getState(fsm) \
     ((fsm)->_state)
+
 #define clearState(fsm) \
     do { \
         (fsm)->_previous_state = (fsm)->_state; \
         (fsm)->_state = NULL; \
     } while (0)
+
 #define setState(fsm, state) \
     do { \
         (fsm)->_state = (state); \
         setState_debug(fsm, state); \
     } while (0)
+
 #define pushState(fsm, state) \
     do { \
         if ((fsm)->_stack_curr >= (fsm)->_stack_max) { \
@@ -191,12 +207,14 @@
         (fsm)->_state = state; \
         pushState_debug(fsm, state); \
     } while (0)
+
 #define popState(fsm) \
     do { \
         (fsm)->_stack_curr --; \
         (fsm)->_state = *((fsm)->_stack_curr); \
         popState_debug(fsm); \
     } while (0)
+
 #define emptyStateStack(fsm) \
     do { \
         (fsm)->_stack_curr = (fsm)->_stack_start; \

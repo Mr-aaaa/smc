@@ -151,7 +151,16 @@ public final class SmcHeaderCGenerator
             _source.println("#define STATEMAP_DEBUG 1");
         }
         _source.println("#include <statemap.h>");
+        _source.println();
 
+        _source.println("#ifndef STATEMAP_NAMES_ONLY");
+        _source.println("#define STATEMAP_NAMES_ONLY 0");
+        _source.println("#endif");
+        _source.println();
+
+        _source.println("#ifndef STATEMAP_DEBUG");
+        _source.println("#define STATEMAP_DEBUG 0");
+        _source.println("#endif");
         _source.println();
 
         // Do user-specified forward declarations now.
@@ -160,6 +169,91 @@ public final class SmcHeaderCGenerator
             _source.print(declaration);
             _source.println();
         }
+
+        // Define state ids
+        _source.print("enum ");
+        _source.print(fsmClassName);
+        _source.println("StateIds {");
+        int stateId = 1;
+        for (SmcMap map: fsm.getMaps())
+        {
+            for (SmcState state: map.getStates())
+            {
+                _source.print("    ");
+                _source.print(fsmClassName);
+                _source.print("StateIds_");
+                _source.print(map.getName());
+                _source.print("_");
+                _source.print(state.getInstanceName());
+                _source.print(" = ");
+                _source.print(stateId);
+                _source.println(",");
+                stateId++;
+            }
+        }
+        _source.println("};");
+        _source.println();
+
+        // Define transition ids
+        _source.print("enum ");
+        _source.print(fsmClassName);
+        _source.println("TransitionIds {");
+        int transitionId = 1;
+        for (SmcTransition trans: fsm.getTransitions())
+        {
+            // Don't output the default state here.
+            if (trans.getName().equals("Default") == false)
+            {
+                _source.print("    ");
+                _source.print(fsmClassName);
+                _source.print("TransitionIds_");
+                _source.print(trans.getName());
+                _source.print(" = ");
+                _source.print(transitionId);
+                _source.println(",");
+                transitionId++;
+            }
+        }
+        _source.println("};");
+
+        _source.println();
+        _source.println("#if STATEMAP_NAMES_ONLY || STATEMAP_DEBUG");
+
+        // Declare name look-up tables
+        _source.println();
+        _source.print("extern const char *const ");
+        _source.print(fsmClassName);
+        _source.println("StateNamesTable[];");
+        _source.print("extern const int ");
+        _source.print(fsmClassName);
+        _source.println("StateNamesTableLength;");
+
+        _source.println();
+        _source.print("extern const char *const ");
+        _source.print(fsmClassName);
+        _source.println("TransitionNamesTable[];");
+        _source.print("extern const int ");
+        _source.print(fsmClassName);
+        _source.println("TransitionNamesTableLength;");
+
+        _source.println();
+        _source.println("#endif /* STATEMAP_NAMES_ONLY || STATEMAP_DEBUG */");
+
+        // Define initialization of name look-up tables
+        _source.println();
+        _source.println("#if STATEMAP_DEBUG");
+        _source.println("#define FSM_INIT_DEBUG_NAMES(fsm) \\");
+        _source.println("    do { \\");
+        _source.print("        (fsm)->_stateNames = ");
+        _source.print(fsmClassName);
+        _source.println("StateNamesTable; \\");
+        _source.print("        (fsm)->_transitionNames = ");
+        _source.print(fsmClassName);
+        _source.println("TransitionNamesTable; \\");
+        _source.println("    } while (0)");
+        _source.println("#else /* STATEMAP_DEBUG */");
+        _source.println("#define FSM_INIT_DEBUG_NAMES");
+        _source.println("#endif /* STATEMAP_DEBUG */");
 
         // Forward declare the application class.
         _source.println();
@@ -315,7 +409,9 @@ public final class SmcHeaderCGenerator
             }
         }
 
-        _source.println("#else");
+        _source.print("#else /* NO_");
+        _source.print(targetfileCaps);
+        _source.println("_MACRO */");
 
         // Constructor
         _source.print("#define ");
@@ -364,9 +460,11 @@ public final class SmcHeaderCGenerator
                 _source.println(") \\");
                 _source.println("    do { \\");
                 _source.println("        assert(getState(fsm) != NULL); \\");
-                _source.print("        setTransition((fsm), \"");
+                _source.print("        setTransition((fsm), ");
+                _source.print(fsmClassName);
+                _source.print("TransitionIds_");
                 _source.print(trans.getName());
-                _source.println("\"); \\");
+                _source.println("); \\");
                 _source.print("        getState(fsm)->");
                 _source.print(trans.getName());
                 _source.print("((fsm)");
@@ -377,14 +475,19 @@ public final class SmcHeaderCGenerator
                     _source.print(")");
                 }
                 _source.println("); \\");
-                _source.println("        setTransition((fsm), NULL); \\");
+                _source.println("        setTransition((fsm), 0); \\");
                 _source.println("    } while (0)");
             }
         }
 
-        _source.println("#endif");
+        _source.print("#endif /* NO_");
+        _source.print(targetfileCaps);
+        _source.println("_MACRO */");
+
         _source.println();
-        _source.println("#endif");
+        _source.print("#endif /* _");
+        _source.print(targetfileCaps);
+        _source.println("_H */");
 
         _source.println();
         _source.println("/*");
