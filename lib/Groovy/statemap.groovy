@@ -50,7 +50,7 @@ class TransitionUndefinedException extends RuntimeException {
     def msg
 
     def TransitionUndefinedException (msg) {
-        super()
+        super(msg)
         this.msg = msg
     }
 
