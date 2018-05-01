@@ -325,7 +325,7 @@ public final class SmcGroovyGenerator
 
         // Declare the base state class.
         _source.println();
-        _source.print("private class ");
+        _source.print("class ");
         _source.print(context);
         _source.println("State extends statemap.State {");
         _source.println();
@@ -431,7 +431,7 @@ public final class SmcGroovyGenerator
         }
 
         // Declare the map default state class.
-        _source.print("private class ");
+        _source.print("class ");
         _source.print(mapName);
         _source.print("_Default extends ");
         _source.print(context);
@@ -552,7 +552,7 @@ public final class SmcGroovyGenerator
         String indent2;
 
         _source.println();
-        _source.print("private class ");
+        _source.print("class ");
         _source.print(mapName);
         _source.print('_');
         _source.print(stateName);
