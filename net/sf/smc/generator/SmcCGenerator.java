@@ -226,8 +226,15 @@ public final class SmcCGenerator
 
                 _source.println(")");
                 _source.println("{");
-                _source.println(
-                    "    getState(fsm)->Default(fsm);");
+
+                for (SmcParameter param: trans.getParameters())
+                {
+                    _source.print("    (void)");
+                    _source.print(param.getName());
+                    _source.println(";");
+                }
+
+                _source.println("    getState(fsm)->Default(fsm);");
                 _source.println("}");
             }
         }

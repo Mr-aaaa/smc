@@ -73,7 +73,10 @@
     ((state)->_id)
 
 #define State_Default(fsm) \
-    assert(0)
+    do { \
+        (void)(fsm); \
+        assert(0); \
+    } while (0)
 
 #ifdef STATEMAP_DEBUG
 #define FSM_MEMBERS_DEBUG \
